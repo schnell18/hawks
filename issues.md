@@ -1,0 +1,10 @@
+# lua-cjson escape slash issue
+
+lua-cjson escape any occurrence of forward slash(as reported in [this
+issue][1]) with back slash althought the JSON specification does not mandate
+this feature. This breaks application does not expect the escaped form.
+
+    2018/06/12 18:07:08 [info] 6825#0: *41 [lua] tunnel.lua:305: http_reverse_proxy(): Original body: {"stat":{"systime":1528798028504,"sm":"md5","stateList":[{"length":128,"code":0,"msg":"SUCCESS"}],"code":0,"cid":"a:ab765e|t:23570|s:1528798028492","sig":"1d098320cbd999b708d0b2ef1f1789c8"},"content":[{"booths":[],"name":"ä¸­å<8c>»ä½<93>è´¨è°<83>ç<90><86>Bé<9d>¢","code":"phys-tcm-therapy","custom0":"https://www.test.pajk.cn/shop/#/market/10226"}]}, client: 10.255.0.133, server: api.test.pajk.cn, request: "GET /m.api?_mt=octopus.queryLandingPage&query=%7B%22pageCode%22%3A%22phys-tcm-therapy%22%7D&_sm=md5&_vc=0&_st=1528798028429.0.8512569958908756&_sig=a3a89e46067955196fcd2fdc51187462 HTTP/1.1", host: "api.test.pajk.cn", referrer: "https://www.test.pajk.cn/blade/web/index.html"
+    2018/06/12 18:07:08 [info] 6825#0: *41 [lua] tunnel.lua:309: http_reverse_proxy(): Rewritten body: {"stat":{"cid":"a:ab765e|t:23570|s:1528798028492","code":0,"sig":"1d098320cbd999b708d0b2ef1f1789c8","sm":"md5","systime":1528798028504,"stateList":[{"length":128,"code":0,"msg":"SUCCESS"}]},"content":[{"custom0":"https:\/\/www.test.pajk.cn\/shop\/#\/market\/10226","code":"phys-tcm-therapy","name":"ä>¸­å<8c>»ä½<93>è´¨è°<83>ç<90><86>Bé<9d>¢","booths":{}}]}, client: 10.255.0.133, server: api.test.pajk.cn, request: "GET /m.api?_mt=octopus.queryLandingPage&query=%7B%22pageCode%22%3A%22phys-tcm-therapy%22%7D&_sm=md5&_vc=0&_st=1528798028429.0.8512569958908756&_sig=a3a89e46067955196fcd2fdc51187462 HTTP/1.1", host: "api.test.pajk.cn", referrer: "https://www.test.pajk.cn/blade/web/index.html"
+
+[1]: https://github.com/mpx/lua-cjson/issues/2

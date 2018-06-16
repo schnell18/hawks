@@ -1,0 +1,17 @@
+{
+  "name": "websocket-demo",
+  "private": true,
+  "version": "1.0.0",
+  "author": {
+    "name": "Justin Zhang",
+    "email": "schnell18@gmail.com"
+  },
+  "scripts": {
+    "prestart": "npm install",
+    "start": "node server.js",
+    "pretest": "npm install"
+  },
+  "devDependencies": {
+    "ws": "4.0.0"
+  }
+}

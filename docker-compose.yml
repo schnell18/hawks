@@ -1,0 +1,29 @@
+# dockerized virtual environment
+version: '3'
+services:
+  openresty-dev:
+    image: "harbor.dev.pajkdc.com/pajk_dev/openresty-dev:1.13.6.1-alpine"
+    volumes:
+      - ./oss/lua-resty-websocket/:/work
+  outerlb:
+    image: "harbor.dev.pajkdc.com/pajk_dev/openresty:1.13.6.1-alpine"
+    volumes:
+      - ./provision/outerlb/conf:/usr/local/openresty/nginx/conf
+      - ./provision/outerlb/pki:/data/pki
+      - ./src/server/lua:/lua_ngx
+      - ./src/client/web:/data/www/ws
+      - ./oss/lua-resty-websocket/lib/resty/websocket:/usr/local/openresty/lualib/resty/websocket
+      - ./oss/lua-resty-http/lib/resty/:/usr/local/openresty/site/lualib/resty
+      - .state/outerlb/log:/var/log/nginx
+    ports:
+      - 80:80
+      - 443:443
+      - 5291:5921
+    depends_on:
+      - innerlb
+  innerlb:
+    image: "harbor.dev.pajkdc.com/pajk_dev/openresty:1.13.6.1-alpine"
+    volumes:
+      - ./provision/innerlb/conf:/usr/local/openresty/nginx/conf
+      - ./provision/innerlb/pki:/data/pki
+      - .state/innerlb/log:/var/log/nginx

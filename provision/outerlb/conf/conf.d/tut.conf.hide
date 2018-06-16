@@ -1,0 +1,80 @@
+server {
+    listen       80;
+    listen       443 ssl;
+    listen       5291 ssl;
+    server_name  tut.jjhome.vn;
+    ssl_certificate  /data/pki/tut.jjhome.vn-cert.pem;
+    ssl_certificate_key  /data/pki/tut.jjhome.vn-key.pem;
+    ssl_protocols  TLSv1 TLSv1.1 TLSv1.2;
+    # add_header Content-Type text/plain;
+
+    location /lua-path {
+        content_by_lua_block {
+            function print_path(path)
+                local i = 1
+                for p in string.gmatch(path, '[^;]+') do
+                    ngx.say(string.format("%03d: %s", i, p))
+                    i = i + 1
+                end
+            end
+
+            ngx.say("Lua package path:")
+            print_path(package.path)
+            ngx.say("C package path:")
+            print_path(package.cpath)
+        }
+    }
+
+    location /cookie {
+        content_by_lua '
+        if ngx.var.cookie__tk == nil then
+        ngx.say("cookie _tk: missing")
+        else
+        ngx.say("cookie _tk: [", ngx.var.cookie__tk, "]")
+        end
+        ';
+    }
+
+    location ~ ^/echo/(?<rep>\d+) {
+        lua_socket_log_errors off;
+        content_by_lua_block {
+            local es = require "ws.echo"
+            function repeater(n)
+                function rep(data)
+                    if data then
+                        return string.rep(data, n)
+                    else
+                        return ""
+                    end
+                end
+                return rep
+            end
+            es.serve(repeater(ngx.var.rep or 3))
+        }
+    }
+
+    # websocket html client
+    location ~ ^/plain|secured|customport {
+        default_type "text/html";
+        root /data/www/ws;
+    }
+
+    location ~ ^/sub/(?<rep>[a-z0-9.]+) {
+        lua_socket_log_errors off;
+        content_by_lua_block {
+            local es = require "ws.echo"
+            function subst(replacement)
+                function rep(data)
+                    if data then
+                        return string.gsub(data, "pajkdc.com", replacement)
+                    else
+                        return ""
+                    end
+                end
+                return rep
+            end
+            es.serve(subst(ngx.var.rep or "pajk.cn"))
+        }
+    }
+
+}

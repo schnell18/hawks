@@ -1,0 +1,11 @@
+node_modules/
+.vagrant/
+.state/
+*.swp
+*.swo
+*.bak
+*.pid
+*.log
+*.pyc
+*.pyo
+*.o
